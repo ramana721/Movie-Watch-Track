@@ -61,6 +61,10 @@ export default function App() {
     return setSelectedId(id);
   }
 
+  function handleCloseMovie(){
+    return setSelectedId(null);
+  }
+
   function handleMovieDelete(id) {
     return setWatched((w) => w.filter((m) => m.imdbID !== id));
   }
@@ -71,13 +75,14 @@ export default function App() {
   // To Fetch Data from OMDB API
   useEffect(
     function () {
+      const controller = new AbortController();
       async function fetchResults() {
         if (!query || query.length < 3) return;
         try {
           setIsError("");
           setIsLoading1((b) => !b);
           const res = await fetch(
-            `https://www.omdbapi.com/?s=${query}&apikey=${apikey}`
+            `https://www.omdbapi.com/?s=${query}&apikey=${apikey}`, {signal : controller.signal}
           );
 
           if (!res.ok) throw new Error("Something Went Wrong...!");
@@ -91,12 +96,20 @@ export default function App() {
           setMovies(() => data.Search);
           // console.log(movies);
         } catch (error) {
-          setIsError(error.message || "Something Went Wrong.");
+          // Excluding the abbort error that we encounter coz of aborting previous HTTP requests.
+          if (error.name !== "AbortError") setIsError(error.message || "Something Went Wrong.");
+
         } finally {
           setIsLoading1((b) => !b);
+          handleCloseMovie();
         }
       }
+
       fetchResults();
+      // Clean up function to abort data fetching of previous calls ( Unnecessary HTTP Requests.)
+      return function (){
+        controller.abort();
+      }
     },
     [query]
   );
@@ -168,16 +181,15 @@ export default function App() {
           {!isLoading2 && selectedId != null && (
             <MovieDetails
               movieDetails={movieDetails}
-              handleSelectedId={handleSelectedId}
+              handleCloseMovie={handleCloseMovie}
               handleAddMovie={handleAddMovie}
               toggleShowModal={setShowModal}
               setNewAddedMovie={setNewAddedMovie}
-              watched ={watched}
+              watched={watched}
             />
           )}
         </>
       </Main>
-      {/* <StarRating /> */}
     </>
   );
 }

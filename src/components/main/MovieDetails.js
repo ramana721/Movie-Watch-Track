@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import StarRating from "../StarRating";
 
 export default function MovieDetails({
   movieDetails,
-  handleSelectedId,
+  handleCloseMovie,
   handleAddMovie,
   toggleShowModal,
   setNewAddedMovie,
@@ -37,11 +37,30 @@ export default function MovieDetails({
     // userRating: 9,
   };
   const isRated = watched.find((movie) => movie.imdbID === imdbID);
+// To Change Website Title
+  useEffect(function(){
+    document.title = `Movie | ${title}`;
+    // Clean Up Function to Change the name back to website name
+    return function(){
+      document.title = 'WatchTrack';
+    }
+  }, [title])
+// To add keyPress to return back from movie details.
+  useEffect(function(){
+    function callBack(e){
+      if (e.code === "Escape") handleCloseMovie();
+    }
+    document.addEventListener("keydown", callBack);
+    // To Remove event listener if the component is unmounted, to avoid stacking of event listeners.
+    return function(){
+      document.removeEventListener("keydown", callBack);
+    }
+  }, [handleCloseMovie])
 
   return (
     <div className="details box">
       <header>
-        <button className="btn-back" onClick={() => handleSelectedId(imdbID)}>
+        <button className="btn-back" onClick={() => handleCloseMovie()}>
           &larr;
         </button>
         <img src={poster} alt={`${title} Poster`} />
@@ -73,7 +92,7 @@ export default function MovieDetails({
                 onClick={() => {
                   movie["userRating"] = rated;
                   handleAddMovie(movie);
-                  handleSelectedId(imdbID);
+                  handleCloseMovie();
                   setNewAddedMovie((m) => title);
                   toggleShowModal((s) => true);
                 }}
@@ -82,7 +101,9 @@ export default function MovieDetails({
               </button>
             )}
           </div>
-        ) : <p>You have rated this Movie as {isRated.userRating} ⭐</p>}
+        ) : (
+          <p>You have rated this Movie as {isRated.userRating} ⭐</p>
+        )}
         <p>
           <em>{plot}</em>
         </p>
