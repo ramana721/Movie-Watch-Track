@@ -6,7 +6,7 @@ import MovieWatched from "./main/MovieWatched";
 import MovieDetails from "./main/MovieDetails";
 
 // import StarRating from "./StarRating";
-import { hover } from "@testing-library/user-event/dist/hover";
+// import { hover } from "@testing-library/user-event/dist/hover";
 
 // import axios from 'axios';
 
@@ -152,7 +152,7 @@ export default function App() {
 
       <Main>
         <>
-          {!isLoading1 && isError.length == 0 && (
+          {!isLoading1 && isError.length === 0 && (
             <MovieResults
               handleSelectedId={handleSelectedId}
               setIsOpen1={setIsOpen1}
