@@ -27,5 +27,5 @@
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/yourusername/movie-watch-track.git
+   git clone https://github.com/ramana721/Movie-Watch-Track.git
    cd movie-watch-track
